@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Лабиринт Дэнди?.. для ес беар</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="game-container">
+<div id="hud" class="hidden">
+<div id="key-counter">0/16</div>
+
+<div class="top-right-hud">
+<button id="pause-btn">||</button>
+<div id="inventory-container">
+<div id="inventory">
+<div class="slot active" id="slot-0"></div>
+<div class="slot" id="slot-1"></div>
+<div class="slot" id="slot-2"></div>
+<div class="slot" id="slot-3"></div>
+<div class="slot" id="slot-4"></div>
+</div>
+<div id="item-name"></div>
+</div>
+</div>
+
+<div id="stamina-bar-container"><div id="stamina-bar"></div></div>
+<div id="message"></div>
+</div>
+
+<div id="mobile-controls">
+<div id="joystick-zone"><div id="joystick-knob"></div></div>
+<div class="touch-btn" id="btn-grab">ВЗЯТЬ</div>
+<div class="touch-btn" id="btn-use">ЮЗ</div>
+<div class="touch-btn" id="btn-run">БЕГ</div>
+<div class="touch-btn" id="btn-lookback">НАЗАД</div>
+</div>
+
+<!-- Диалог Астро -->
+<div id="astro-dialog" class="screen hidden" style="background: rgba(0,0,0,0.4); justify-content: flex-end; padding-bottom: 50px; pointer-events: auto;">
+<div style="background: #222; border: 2px solid #555; padding: 20px; width: 80%; max-width: 600px; text-align: center;">
+<h2 style="color: #00ffcc; margin-top: 0; justify-content: center;">Астро</h2>
+<p id="astro-dialog-text" style="font-size: calc(18px * var(--ui-scale)); white-space: pre-line; margin-bottom: 20px;"></p>
+<div id="astro-dialog-buttons">
+<button id="astro-btn-yes">Да</button>
+<button id="astro-btn-no">Нет</button>
+</div>
+</div>
+</div>
+
+<div id="warning-screen" class="screen">
+<h1 style="color: red; text-shadow: 2px 2px 0 #000;">ПРЕДУПРЕЖДЕНИЕ</h1>
+<textarea id="warning-text" readonly style="width: 80%; height: 50%; max-width: 600px; background: #111; color: white; font-family: 'GameFont', monospace; font-size: calc(16px * var(--ui-scale)); border: 2px solid #555; padding: 10px; resize: none; margin-bottom: 20px;"></textarea>
+<button id="continue-btn">Продолжить</button>
+</div>
+
+<div id="menu-screen" class="screen hidden">
+<h1 id="game-title" style="cursor: pointer;" title="Нажмите в паузе для открытия Админ Панели">Dandys maze?.. для ес беар</h1>
+<button id="play-btn">Играть</button>
+<button id="settings-btn">Настройки</button>
+<button id="fullscreen-btn" style="position: absolute; bottom: calc(20px * var(--ui-scale)); right: calc(20px * var(--ui-scale));">Полноэкранный режим</button>
+</div>
+
+<div id="settings-screen" class="screen hidden">
+<h1>Настройки</h1>
+<label>Чувствительность камеры</label>
+<input type="range" id="sens-slider" min="0.1" max="5" step="0.1" value="1">
+<label>Размер UI</label>
+<input type="range" id="ui-slider" min="0.5" max="2" step="0.1" value="1">
+<label style="margin-top: 15px; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+<input type="checkbox" id="touch-controls-checkbox" style="width: auto;"> Сенсорное управление
+</label>
+<button id="back-btn">Назад</button>
+</div>
+
+<!-- Админ Панель -->
+<div id="admin-screen" class="screen hidden">
+<h1 style="color: #00ffcc;">Панель Администратора</h1>
+<div class="admin-grid">
+  <div class="admin-box">
+    <h2>Читы Игрока</h2>
+    <button id="adm-god">Режим бога: ВЫКЛ</button>
+    <button id="adm-noclip">NoClip: ВЫКЛ</button>
+    <button id="adm-fly">Полёт: ВЫКЛ</button>
+  </div>
+
+  <div class="admin-box">
+    <h2>Инвентарь <button id="adm-reset-inv" class="btn-reset">Сброс</button></h2>
+    <select id="adm-item-select">
+      <option value="chocolate">Шоколад</option>
+      <option value="slime">Слайм</option>
+      <option value="key">Ключ</option>
+      <option value="hammer">Молоток</option>
+      <option value="secret button">Секретная кнопка</option>
+      <option value="bonbon">Бонбон</option>
+      <option value="coconut">Кокос</option>
+    </select>
+    <button id="adm-give-item">Выдать предмет</button>
+    <button id="adm-clear-slot">Очистить активный слот</button>
+    <label>Слотов инвентаря:</label>
+    <div>
+      <button id="adm-slot-minus">-</button>
+      <span id="adm-slot-count">5</span>
+      <button id="adm-slot-plus">+</button>
+    </div>
+  </div>
+
+  <div class="admin-box">
+    <h2>Подсветка (ESP)</h2>
+    <button id="adm-esp-monster">ESP Монстр: ВЫКЛ</button>
+    <button id="adm-esp-dandy">ESP Dandy: ВЫКЛ</button>
+    <button id="adm-esp-lampa">ESP Лампа: ВЫКЛ</button>
+  </div>
+
+  <div class="admin-box">
+    <h2>Скорость Игрока <button id="adm-reset-pspeed" class="btn-reset">Сброс</button></h2>
+    <label>Ходьба: <span id="adm-val-walk">3.5</span></label>
+    <input type="range" id="adm-speed-walk" min="1" max="20" step="0.5" value="3.5">
+    <label>Множитель бега: <span id="adm-val-run">1.8</span></label>
+    <input type="range" id="adm-speed-run" min="1" max="5" step="0.1" value="1.8">
+  </div>
+
+  <div class="admin-box">
+    <h2>Скорость Врагов <button id="adm-reset-espeed" class="btn-reset">Сброс</button></h2>
+    <label>Чёрный монстр: <span id="adm-val-mSpeed">2.0</span></label>
+    <input type="range" id="adm-speed-monster" min="0.5" max="15" step="0.5" value="2.0">
+    <label>Dandy: <span id="adm-val-dSpeed">3.4</span></label>
+    <input type="range" id="adm-speed-dandy" min="0.5" max="15" step="0.5" value="3.4">
+  </div>
+
+  <div class="admin-box">
+    <h2>Мир и Графика <button id="adm-reset-world" class="btn-reset">Сброс</button></h2>
+    <button id="adm-regen">Перегенерировать лабиринт</button>
+    <button id="adm-pixel">Пикселизация: ВКЛ</button>
+    <button id="adm-aspect">Соотношение сторон: 4:3</button>
+    <label>Дальность тумана: <span id="adm-val-fog">0.08</span></label>
+    <input type="range" id="adm-fog-density" min="0" max="0.25" step="0.01" value="0.08">
+  </div>
+
+  <div class="admin-box">
+    <h2>Спавн Объектов</h2>
+    <select id="adm-spawn-select">
+      <option value="monster">Чёрный монстр</option>
+      <option value="dandy">Dandy</option>
+      <option value="lampa">Лампа</option>
+      <option value="wall">Стена</option>
+      <option value="tex_wall">Стена с текстурой</option>
+    </select>
+    <button id="adm-spawn-btn">Заспавнить перед собой</button>
+    <button id="adm-clear-nearby">Удалить всё рядом</button>
+  </div>
+</div>
+<button id="admin-back-btn" style="margin-top: 15px; background: #882222;">Назад</button>
+</div>
+
+<div id="black-screen"></div>
+<video id="end-video" src="end.mp4"></video>
+</div>
+
+<script src="three.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
